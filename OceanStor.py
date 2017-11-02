@@ -19,10 +19,15 @@ import datetime
 from cookielib import CookieJar
 
 
-# Constants
+class OceanStorError(Exception):
+    """Class for OceanStor derived errors."""
 
+    def __init__(self, msg=None):
+        if msg is None:
+            # Set some default useful error message
+            msg = "An error occured connecting to OceanStor"
+        super(OceanStorError, self).__init__(msg)
 
-# Globals
 
 class OceanStor(object):
     """Class that connects to OceanStor device and gets information."""
@@ -35,6 +40,7 @@ class OceanStor(object):
         self.timeout = timeout
         # Create reusable http components
         self.cookies = CookieJar()
+        ###### Comment out following lines for python 2.6 ######
         self.ctx = ssl.create_default_context()
         # Ignorar validesa del certificat
         self.ctx.check_hostname = False
@@ -42,6 +48,11 @@ class OceanStor(object):
         # Afegir debuglevel=1 a HTTPSHandler per depurar crides
         self.opener = urllib2.build_opener(urllib2.HTTPSHandler(context=self.ctx),
                                            urllib2.HTTPCookieProcessor(self.cookies))
+        ###### Until here and uncomment these #####
+        ######
+        #self.opener = urllib2.build_opener(urllib2.HTTPSHandler(),
+        #                                   urllib2.HTTPCookieProcessor(self.cookies))
+        ###### Until #####
         self.opener.addheaders = [('Content-Type', 'application/json; charset=utf-8')]
 
 
@@ -140,11 +151,11 @@ class OceanStor(object):
                     if i["ISCLONEFS"] == "false":
                         size = float(i["CAPACITY"])/1024/1024  # To GB
                         free = float(i["AVAILABLECAPCITY"])/1024/1024  # To GB
-                        pctfree = (free/size)*100
+                        pctused = (1-(free/size))*100
                         a.append([i["NAME"],
                                   size,
-                                  free,
-                                  pctfree])
+                                  size-free,
+                                  pctused])
         except Exception as e:
             print format(e)
             return None

@@ -35,9 +35,9 @@ def us(warning, critical):
     print "  -n, --name     : Name of the filesystem to check."
     print "                   You can add a '*' at the end to match longer"
     print "                   prefixes. No regexp allowed"
-    print "  -w, --warning  : Minimun % of free space expected before warning"
+    print "  -w, --warning  : Minimun % of used space expected before warning"
     print "                   defaults to {0}".format(warning)
-    print "  -c, --critical : Minimun % of free space expected before critical"
+    print "  -c, --critical : Minimun % of used space expected before critical"
     print "                   defaults to {0}".format(critical)
     print "  -t, --timeout  : timeout in seconds"
     print "  -h, --help     : This text"
@@ -122,17 +122,17 @@ def main(argv):
         sys.exit(2)
     for i in fs:
         prefix = "OK:"
-        if i[3] < critical:
+        if i[3] > critical:
             criticals = criticals + 1
             criticalfs = criticalfs + " " + i[0]
             prefix = "CRITICAL:"
-        elif i[3] < warning:
+        elif i[3] > warning:
             warnings = warnings + 1
             warningfs = warningfs + " " + i[0]
             prefix = "WARNING:"
         else:
             okfs = okfs + " " + i[0]
-        text = text + "{0} filesystem {1}: size:{2:6.0f}, free:{3:6.0f}, pctfree: {4:5.2f}%\n"\
+        text = text + "{0} filesystem {1}: size:{2:6.0f}GB, used:{3:6.0f}GB, pctused: {4:5.2f}%\n"\
               .format(prefix, i[0], i[1], i[2], i[3])
         performance = performance + " '{0}'={1:5.2f}%".format(i[0], i[3])
     if criticals > 0:
