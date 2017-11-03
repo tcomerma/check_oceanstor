@@ -5,6 +5,8 @@ Nagios plugin for monitoring Huawei OceanStor storage devices using the API
 Commands implemented
     check_oceanstor_alarms.py: Checks for active alarms
     check_oceanstor_filesystems.py: Checks free space on filesystems
+    check_oceanstor_diskdomains.py: Checks free space on diskdomains
+    check_oceanstor_storagepools.py: Checks free space on storagepools
 
 Just an small subset of what is possible is implemented, but it's what we need.
 EVERYTHING on an OceanStor can be done using the API. If not convinced,
