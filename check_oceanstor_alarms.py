@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#!/# -*- coding: utf-8 -*-
 """Check alarms on OceanStor storage devices using API."""
 #
 #

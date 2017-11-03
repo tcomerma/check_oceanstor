@@ -10,7 +10,7 @@
 #
 # TODO:
 #   https port number (8088) as parameter
-#   verify that numeric parameters are really numbers
+#   verify thar numeric parameters are really numbers
 #   better handling of exception situations in general
 
 import sys
@@ -28,12 +28,12 @@ def signal_handler(signal, frame):
 
 def us(warning, critical):
     """Print usage information."""
-    print 'check_oceanstor_filesystems.py -H -s -u -p -n [-w] [-c] [-t] [-h]'
+    print 'check_oceanstor_diskdomains.py -H -s -u -p -n [-w] [-c] [-t] [-h]'
     print "  -H, --host     : IP or DNS address"
     print "  -s, --system   : System_id of the OceanStor"
     print "  -u, --username : username to log into"
     print "  -p, --password : password"
-    print "  -n, --name     : Name of the filesystem to check."
+    print "  -n, --name     : Name of the diskdomain to check."
     print "                   You can add a '*' at the end to match longer"
     print "                   prefixes. No regexp allowed"
     print "  -w, --warning  : Minimun % of used space expected before warning"
@@ -42,6 +42,18 @@ def us(warning, critical):
     print "                   defaults to {0}".format(critical)
     print "  -t, --timeout  : timeout in seconds"
     print "  -h, --help     : This text"
+
+
+def check_error_level(status, level, health):
+    if status[3] > level or \
+       status[4] == health:
+        return True
+    else:
+        return False
+
+
+def format_results(str, i):
+    return "{0} {1} {2}".format(str, i[0], i[4])
 
 
 def main(argv):
@@ -54,6 +66,7 @@ def main(argv):
     timeout = 10
     warning = 75
     critical = 90
+    name = "*"
 
     #   Llegir parametres de linia de comandes
     try:
@@ -114,40 +127,40 @@ def main(argv):
     performance = "|"
     warnings = 0
     criticals = 0
-    criticalfs = ""
-    warningfs = ""
-    okfs = ""
-    fs = os.filesystems(name)
+    oks = 0
+    criticaldd = ""
+    warningdd = ""
+    okdd = ""
+    fs = os.diskdomains(name)
     if fs is None:
-        print "ERROR: filesystem {0} not found" . format(name)
+        print "ERROR: diskdomain {0} not found" . format(name)
         sys.exit(2)
+    # Check for space usage
     for i in fs:
-        prefix = "OK:"
-        if i[3] > critical:
+        if check_error_level(i, critical, "fault"):
             criticals = criticals + 1
-            criticalfs = criticalfs + " " + i[0]
-            prefix = "CRITICAL:"
-        elif i[3] > warning:
+            criticaldd = format_results(criticaldd, i)
+        elif check_error_level(i, warning, "degraded"):
             warnings = warnings + 1
-            warningfs = warningfs + " " + i[0]
-            prefix = "WARNING:"
+            warningdd = format_results(warningdd, i)
         else:
-            okfs = okfs + " " + i[0]
-        text = text + "{0} filesystem {1}: size:{2:6.0f}GB, used:{3:6.0f}GB, pctused: {4:5.2f}%\n"\
-              .format(prefix, i[0], i[1], i[2], i[3])
+            oks = oks + 1
+            okdd = format_results(okdd, i)
+        text = text + "Diskdomain {0}({1}): size:{2:6.0f}GB, used:{3:6.0f}GB, pctused: {4:5.2f}%\n"\
+              .format(i[0], i[4], i[1], i[2], i[3])
         performance = performance + " '{0}'={1:5.2f}%".format(i[0], i[3])
     if criticals > 0:
-        print "CRITICAL: [{0}] in CRITICAL state, [{1}] in WARNING state, [{2}] OK"\
-              .format(criticalfs, warningfs, okfs)
+        print "CRITICAL: {0} [{1}] in CRITICAL state, {2} [{3}] in WARNING state, {4} [{5}] OK"\
+              .format(criticals, criticaldd, warnings, warningdd, oks, okdd)
         print text + performance
         exit(2)
     elif warnings > 0:
-        print "WARNING: [{0}] in WARNING state, [{1}] OK"\
-              .format(warningfs, okfs)
+        print "WARNING: {0} [{1}] in WARNING state, {2} [{3}] OK"\
+              .format(warnings, warningdd, oks, okdd)
         print text + performance
         sys.exit(1)
     else:
-        print "OK: [{0}] OK".format(okfs)
+        print "OK: {0} [{1}] OK".format(oks, okdd)
         print text + performance
         sys.exit(0)
 
