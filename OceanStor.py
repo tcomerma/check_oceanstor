@@ -99,6 +99,22 @@ class OceanStor(object):
         return datetime.datetime.fromtimestamp(
                         int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
 
+
+    def query(self, url):
+        try:
+            response = self.opener.open(url)
+            content = response.read()
+            response_json = json.loads(content)
+            # Comprovar si request ok
+            if response_json['error']['code'] != 0:
+                raise OceanStorError(
+                        "ERROR: Got an error response from system ({0})".
+                        format(response_json['error']['code']))
+        except Exception as e:
+            raise OceanStorError("HTTP Exception: {0}".format(e))
+        return response_json
+
+
     def login(self):
         try:
             formdata = {"username": self.username,
@@ -136,17 +152,10 @@ class OceanStor(object):
         try:
             url = "https://{0}:8088/deviceManager/rest/{1}/system/".\
                   format(self.host, self.system_id)
-            response = self.opener.open(url)
-            content = response.read()
-            response_json = json.loads(content)
-            # Comprvar resultat
-            if response_json['error']['code'] != 0:
-                raise OceanStorError(
-                        "ERROR: Got an error response from system ({0})".
-                        format(response_json['error']['code']))
+            response_json = self.query(url)
             self.sectorsize = float(response_json['data']['SECTORSIZE'])
         except Exception as e:
-            raise OceanStorError("HTTP Exception: {0}".format(e))
+            pass
         return True
 
     def alarms(self):
@@ -154,20 +163,13 @@ class OceanStor(object):
         try:
             url = "https://{0}:8088/deviceManager/rest/{1}/alarm/currentalarm".\
                   format(self.host, self.system_id)
-            response = self.opener.open(url)
-            content = response.read()
-            response_json = json.loads(content)
-            # Comprovar si alarmes
-            if response_json['error']['code'] != 0:
-                raise OceanStorError(
-                        "ERROR: Got an error response from system ({0})".
-                        format(response_json['error']['code']))
+            response_json = self.query(url)
             for i in response_json["data"]:
                 a.append([self.alarm_level_text(i["level"]),
                           self.date_to_human(i["startTime"]),
                           i["description"]])
         except Exception as e:
-            raise OceanStorError("HTTP Exception: {0}".format(e))
+            pass
         return a
 
     def filesystems(self, pattern):
@@ -182,14 +184,7 @@ class OceanStor(object):
                   format(self.host, self.system_id)
             url = url + urllib.urlencode({'filter': 'NAME:{0}'.
                                           format(pattern)})
-            response = self.opener.open(url)
-            content = response.read()
-            response_json = json.loads(content)
-            # Comprovar si request ok
-            if response_json['error']['code'] != 0:
-                raise OceanStorError(
-                        "ERROR: Got an error response from system ({0})".
-                        format(response_json['error']['code']))
+            response_json = self.query(url)
             # Get interesting data into list
             for i in response_json["data"]:
                 if (
@@ -209,32 +204,6 @@ class OceanStor(object):
         return a
 
 
-    """
-
-    NAME
-    HEALTHSTATUS
-    Health status.
-    The value is described as follows:
-    1: normal
-    2: fault
-    5: degraded
-
-    TOTALCAPACITY (sectors)
-    FREECAPACITY (sectors)
-    USEDCAPACITY
-
-    RUNNINGSTATUS
-    The value is described as follows:
-    14: pre-copy
-    16: reconstruction
-    27: online
-    28: offline
-    32: balancing
-    53: initializing
-
-    Sectorsize a https://${ip}:${port}/deviceManager/rest/${deviceId}/system/
-    """
-
     def diskdomains(self, pattern):
         a = list()
         try:
@@ -246,14 +215,7 @@ class OceanStor(object):
                 wildcard = False
             url = "https://{0}:8088/deviceManager/rest/{1}/diskpool".\
                    format(self.host, self.system_id)
-            response = self.opener.open(url)
-            content = response.read()
-            response_json = json.loads(content)
-            # Comprovar si request ok
-            if response_json['error']['code'] != 0:
-                raise OceanStorError(
-                        "ERROR: Got an error response from system ({0})".
-                        format(response_json['error']['code']))
+            response_json = self.query(url)
             # Get interesting data into list
             for i in response_json["data"]:
                 if (
@@ -273,52 +235,7 @@ class OceanStor(object):
             raise OceanStorError("HTTP Exception: {0}".format(e))
         return a
 
-    """
-    HEALTHSTATUS
-    Mandatory
-    string(enum)
-    Health status.
-    The value is described as follows:
-    1: normal
-    2: fault
-    5: degraded
 
-    RUNNINGSTATUS
-    Mandatory
-    string(enum)
-    Operating status.
-    The value is described as follows:
-    14: pre-copy
-    16: reconstruction
-    27: online
-    28: offline
-    32: balancing
-    53: initializing
-
-    USERTOTALCAPACITY
-    Mandatory
-    string(uint64)
-    Total capacity.
-    Unit：sectors
-
-    USERFREECAPACITY
-    Mandatory
-    string(uint64)
-    Free capacity.
-    Unit：sectors
-
-    USERCONSUMEDCAPACITY
-    Mandatory
-    string(uint64)
-    Used capacity.
-    Unit：sectors
-
-    USERCONSUMEDCAPACITYPERCENTAGE
-    Mandatory
-    string(uint32)
-    Used capacity ratio.
-    Unit：%
-    """
     def storagepools(self, pattern):
         a = list()
         try:
@@ -330,14 +247,7 @@ class OceanStor(object):
                 wildcard = False
             url = "https://{0}:8088/deviceManager/rest/{1}/storagepool".\
                    format(self.host, self.system_id)
-            response = self.opener.open(url)
-            content = response.read()
-            response_json = json.loads(content)
-            # Comprovar si request ok
-            if response_json['error']['code'] != 0:
-                raise OceanStorError(
-                        "ERROR: Got an error response from system ({0})".
-                        format(response_json['error']['code']))
+            response_json = self.query(url)
             # Get interesting data into list
             for i in response_json["data"]:
                 if (
