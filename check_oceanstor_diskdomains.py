@@ -96,7 +96,7 @@ def main(argv):
         elif opt in ("-p", "--password"):
             password = arg
         elif opt in ("-t", "--timeout"):
-            timeout = arg
+            timeout = int(arg)
         elif opt in ("-w", "--warning"):
             warning = int(arg)
         elif opt in ("-n", "--name"):

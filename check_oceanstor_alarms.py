@@ -75,7 +75,7 @@ def main(argv):
         elif opt in ("-p", "--password"):
             password = arg
         elif opt in ("-t", "--timeout"):
-            timeout = arg
+            timeout = int(arg)
 
     #   Verificacions sobre els parametres
     for i in [host, system_id, username, password, timeout]:
