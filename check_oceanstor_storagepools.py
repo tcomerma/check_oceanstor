@@ -22,7 +22,7 @@ from OceanStor import OceanStor
 
 def signal_handler(signal, frame):
     """Handle timeouts, exiting with a nice message."""
-    print('Execution aborted: Timeout or Ctrl+C')
+    print('UNKNOWN: Timeout contacting device or Ctrl+C')
     sys.exit(3)
 
 
@@ -173,4 +173,5 @@ def main(argv):
 # Crida al programa principal
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGALRM, signal_handler)
     main(sys.argv[1:])
