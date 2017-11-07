@@ -40,6 +40,10 @@ def us(warning, critical):
     print "                   defaults to {0}".format(warning)
     print "  -c, --critical : Minimun % of used space expected before critical"
     print "                   defaults to {0}".format(critical)
+    print "  -W, --Swarning  : Minimun % of snapshot space expected before warning"
+    print "                   defaults to 100%"
+    print "  -C, --Scritical : Minimun % of snapshot space expected before critical"
+    print "                   defaults to 100%"
     print "  -t, --timeout  : timeout in seconds"
     print "  -h, --help     : This text"
 
@@ -54,11 +58,13 @@ def main(argv):
     timeout = 10
     warning = 75
     critical = 90
+    Swarning = 100
+    Scritical = 100
 
     #   Llegir parametres de linia de comandes
     try:
         opts, args = getopt.getopt(argv,
-                                   "hH:s:u:p:t:n:w:c:",
+                                   "hH:s:u:p:t:n:w:c:W:C:",
                                    ["host=",
                                     "help",
                                     "system=",
@@ -67,7 +73,9 @@ def main(argv):
                                     "timeout=",
                                     "name=",
                                     "warning",
-                                    "critical"])
+                                    "critical",
+                                    "Swarning",
+                                    "Scritical"])
     except getopt.GetoptError:
         sys.exit(3)
     for opt, arg in opts:
@@ -90,6 +98,10 @@ def main(argv):
             name = arg
         elif opt in ("-c", "--critical"):
             critical = int(arg)
+        elif opt in ("-W", "--Swarning"):
+            Swarning = int(arg)
+        elif opt in ("-C", "--Scritical"):
+            Scritical = int(arg)
 
     #   Verificacions sobre els parametres
     for i in [host, system_id, username, password, timeout, name]:
@@ -123,19 +135,22 @@ def main(argv):
         sys.exit(2)
     for i in fs:
         prefix = "OK:"
-        if i[3] > critical:
+        if i[3] > critical or i[6] > Scritical:
             criticals = criticals + 1
             criticalfs = criticalfs + " " + i[0]
             prefix = "CRITICAL:"
-        elif i[3] > warning:
+        elif i[3] > warning or i[6] > Scritical:
             warnings = warnings + 1
             warningfs = warningfs + " " + i[0]
             prefix = "WARNING:"
         else:
             okfs = okfs + " " + i[0]
-        text = text + "{0} filesystem {1}: size:{2:6.0f}GB, used:{3:6.0f}GB, pctused: {4:5.2f}%\n"\
+        text = text + "{0} filesystem {1}: size:{2:6.0f}GB, used:{3:6.0f}GB, pctused: {4:5.2f}%"\
               .format(prefix, i[0], i[1], i[2], i[3])
-        performance = performance + " '{0}'={1:5.2f}%".format(i[0], i[3])
+        text = text + " Snapshots reserved:{0:6.0f}GB, used:{1:6.0f}GB, pctused: {2:5.2f}%\n"\
+              .format(i[4], i[5], i[6])
+        performance = performance + " '{0}'={1:5.2f}%".format(i[0], i[3]) + \
+              " '{0}_snapshots'={1:5.2f}%".format(i[0], i[6])
     if criticals > 0:
         print "CRITICAL: [{0}] in CRITICAL state, [{1}] in WARNING state, [{2}] OK"\
               .format(criticalfs, warningfs, okfs)

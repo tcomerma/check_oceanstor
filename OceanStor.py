@@ -194,16 +194,22 @@ class OceanStor(object):
                    ):
                     if i["ISCLONEFS"] == "false":
                         size = float(i["CAPACITY"])/1024 / \
-                                1024*(self.sectorsize/1024)  # To GB
+                            1024*(self.sectorsize/1024)  # To GB
                         free = float(i["AVAILABLECAPCITY"]) / \
-                                1024/1024*(self.sectorsize/1024)  # To GB
+                            1024/1024*(self.sectorsize/1024)  # To GB
                         reserved = float(i["SNAPSHOTRESERVECAPACITY"]) / \
-                                1024/1024*(self.sectorsize/1024)  # To GB
+                            1024/1024*(self.sectorsize/1024)  # To GB
+                        usedreserved = float(i["SNAPSHOTUSECAPACITY"]) / \
+                            1024/1024*(self.sectorsize/1024)  # To GB
                         pctused = (1-((free+reserved)/size))*100
+                        pctusedreserved = (usedreserved/(reserved+1))*100
                         a.append([i["NAME"],
                                   size,
                                   size-free-reserved,
-                                  pctused])
+                                  pctused,
+                                  reserved,
+                                  usedreserved,
+                                  pctusedreserved])
         except Exception as e:
             raise OceanStorError("HTTP Exception: {0}".format(e))
         return a
