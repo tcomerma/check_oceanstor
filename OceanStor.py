@@ -175,6 +175,7 @@ class OceanStor(object):
     def filesystems(self, pattern):
         a = list()
         try:
+            self.system()
             if "*" in pattern:
                 wildcard = True
                 pattern = pattern.replace('*', '')
@@ -192,12 +193,16 @@ class OceanStor(object):
                     (not wildcard and i["NAME"] == pattern)
                    ):
                     if i["ISCLONEFS"] == "false":
-                        size = float(i["CAPACITY"])/1024/1024  # To GB
-                        free = float(i["AVAILABLECAPCITY"])/1024/1024  # To GB
-                        pctused = (1-(free/size))*100
+                        size = float(i["CAPACITY"])/1024 / \
+                                1024*(self.sectorsize/1024)  # To GB
+                        free = float(i["AVAILABLECAPCITY"]) / \
+                                1024/1024*(self.sectorsize/1024)  # To GB
+                        reserved = float(i["SNAPSHOTRESERVECAPACITY"]) / \
+                                1024/1024*(self.sectorsize/1024)  # To GB
+                        pctused = (1-((free+reserved)/size))*100
                         a.append([i["NAME"],
                                   size,
-                                  size-free,
+                                  size-free-reserved,
                                   pctused])
         except Exception as e:
             raise OceanStorError("HTTP Exception: {0}".format(e))
