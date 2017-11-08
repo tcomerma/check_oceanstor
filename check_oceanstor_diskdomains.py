@@ -146,9 +146,9 @@ def main(argv):
         else:
             oks = oks + 1
             okdd = format_results(okdd, i)
-        text = text + "Diskdomain {0}({1}): size:{2:6.0f}GB, used:{3:6.0f}GB, pctused: {4:5.2f}%\n"\
+        text = text + "Diskdomain {0}({1}): size: {2:.0f}GB, used: {3:.0f}GB, pctused: {4:.2f}%\n"\
               .format(i[0], i[4], i[1], i[2], i[3])
-        performance = performance + " '{0}'={1:5.2f}%".format(i[0], i[3])
+        performance = performance + " '{0}'={1:.2f}%".format(i[0], i[3])
     if criticals > 0:
         print "CRITICAL: {0} [{1}] in CRITICAL state, {2} [{3}] in WARNING state, {4} [{5}] OK"\
               .format(criticals, criticaldd, warnings, warningdd, oks, okdd)
