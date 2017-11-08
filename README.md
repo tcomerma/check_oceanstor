@@ -45,7 +45,7 @@ OK: filesystem FSname9: size: 11264GB, used:     0GB, pctused:  0.00% Snapshots 
 | 'FSname0'=67.03% 'FSname0_snapshots'= 0.00% 'FSname1'=66.82% 'FSname1_snapshots'= 0.00% 'FSname2'=68.57% 'FSname2_snapshots'= 0.00% 'FSname3'=68.02% 'FSname3_snapshots'= 0.00% 'FSname4'=68.40% 'FSname4_snapshots'= 0.00% 'FSname5'=62.01% 'FSname5_snapshots'= 0.00% 'FSname6'=64.34% 'FSname6_snapshots'= 0.00% 'FSname7'= 0.00% 'FSname7_snapshots'= 0.00% 'FSname8'= 0.00% 'FSname8_snapshots'= 0.00% 'FSname9'= 0.00% 'FSname9_snapshots'= 0.00%
 ```
 
-* Check for alarms. The plugin returns all active alarms, with serverity 
+* Check for alarms. The plugin returns all active alarms, with serverity
 ```
 check_oceanstor_alarms.py -H <ADDRESS> -u <USER> -p <PWD> -s <SYSTEM_ID>
 OK: no alarms found | alarms=0
@@ -62,5 +62,5 @@ OK: no alarms found | alarms=0
 Author:
 
    Toni Comerma
-   
+
    CCMA, SA
