@@ -113,7 +113,7 @@ def main(argv):
         print "ERROR: {0} alarms found {1} | alarms={0}".format(num,
                                                                 severity)
         print text
-        exit(3)
+        exit(2)
     else:
         print "OK: no alarms found | alarms=0"
         exit(0)
