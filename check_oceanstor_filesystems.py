@@ -145,9 +145,9 @@ def main(argv):
             prefix = "WARNING:"
         else:
             okfs = okfs + " " + i[0]
-        text = text + "{0} filesystem {1}: size:{2:6.0f}GB, used:{3:6.0f}GB, pctused: {4:.2f}%"\
+        text = text + "{0} filesystem {1}: size: {2:.0f}GB, used: {3:.0f}GB, pctused: {4:.2f}%"\
               .format(prefix, i[0], i[1], i[2], i[3])
-        text = text + " Snapshots reserved:{0:6.0f}GB, used:{1:6.0f}GB, pctused: {2:.2f}%\n"\
+        text = text + " Snapshots reserved: {0:.0f}GB, used: {1:.0f}GB, pctused: {2:.2f}%\n"\
               .format(i[4], i[5], i[6])
         performance = performance + " '{0}'={1:.2f}%".format(i[0], i[3]) + \
               " '{0}_snapshots'={1:.2f}%".format(i[0], i[6])
