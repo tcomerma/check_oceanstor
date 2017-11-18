@@ -60,11 +60,11 @@ class OceanStor(object):
         self.opener.addheaders = [('Content-Type', 'application/json; charset=utf-8')]
 
     def alarm_level_text(self, level):
-        if level == "3":
+        if level == 3:
             return "warning"
-        elif level == "4":
+        elif level == 4:
             return "major"
-        elif level == "5":
+        elif level == 5:
             return "critical"
         else:
             return "unknown"
