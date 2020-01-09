@@ -12,7 +12,8 @@
 # Octubre 2017
 #
 # Modifications
-#
+#   
+#   Jan 2020: Adapt to python for centos /
 # TODO:
 #
 import urllib
@@ -44,19 +45,9 @@ class OceanStor(object):
         self.timeout = timeout
         # Create reusable http components
         self.cookies = CookieJar()
-        ###### Comment out following lines for python 2.6 ######
-        self.ctx = ssl.create_default_context()
-        # Ignorar validesa del certificat
-        self.ctx.check_hostname = False
-        self.ctx.verify_mode = ssl.CERT_NONE
-        # Afegir debuglevel=1 a HTTPSHandler per depurar crides
+        self.ctx = ssl._create_unverified_context()
         self.opener = urllib2.build_opener(urllib2.HTTPSHandler(context=self.ctx),
                                            urllib2.HTTPCookieProcessor(self.cookies))
-        ###### Until here and uncomment these #####
-        ######
-        #self.opener = urllib2.build_opener(urllib2.HTTPSHandler(),
-        #                                   urllib2.HTTPCookieProcessor(self.cookies))
-        ###### Until #####
         self.opener.addheaders = [('Content-Type', 'application/json; charset=utf-8')]
 
     def alarm_level_text(self, level):
